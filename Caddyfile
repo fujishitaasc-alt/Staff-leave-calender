@@ -1,0 +1,4 @@
+{$SITE_DOMAIN} {
+    reverse_proxy app:8000
+    header Referrer-Policy same-origin
+}

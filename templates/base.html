@@ -1,0 +1,5 @@
+{% load static %}<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>やすみの予定 | 職員専用</title><link rel="stylesheet" href="{% static 'app.css' %}"></head><body>
+{% if demo %}<div class="demo">デモ環境 · 架空の職員データです。本番の情報を入力しないでください。</div>{% endif %}
+<header><a class="brand" href="/">やすみの予定<span>STAFF LEAVE CALENDAR</span></a>{% if user.is_authenticated %}<div class="identity">{{ user.name }} · {{ user.get_role_display }}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text">ログアウト</button></form></div>{% endif %}</header>
+{% if user.is_authenticated %}<nav><a href="/">共有カレンダー</a><a href="{% url 'mine' %}">自分の予定</a><a href="{% url 'new' %}">＋ 休暇を登録</a>{% if user.is_staff %}<a href="/admin/">管理画面</a>{% endif %}<a href="{% url 'password_change' %}">パスワード変更</a></nav>{% endif %}
+<main>{% for message in messages %}<div class="message" role="status">{{ message }}</div>{% endfor %}{% block content %}{% endblock %}</main><footer>休暇の予定を共有して、無理のない調整を。<br>時刻はすべて日本時間（JST）です。</footer></body></html>

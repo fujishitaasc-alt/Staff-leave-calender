@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: leave
+      POSTGRES_USER: leave
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD を設定してください}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U leave -d leave"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DEMO: "0"
+      DEBUG: "0"
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY を設定してください}
+      DATABASE_URL: postgresql://leave:${POSTGRES_PASSWORD}@db:5432/leave
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "-c", "python manage.py collectstatic --noinput && exec gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --access-logfile -"]
+  web:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?SITE_DOMAIN を設定してください}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
