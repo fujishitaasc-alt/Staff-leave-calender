@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<section class="card narrow"><h1>予定を取り消しますか？</h1><p>{{ item }}</p><form method="post">{% csrf_token %}<button class="danger">この予定を取り消す</button> <a href="{% url 'mine' %}">戻る</a></form></section>{% endblock %}
