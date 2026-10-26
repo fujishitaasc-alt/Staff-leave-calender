@@ -38,3 +38,9 @@
 - GitHub Actions上での実行結果。ワークフローはSQLite/PostgreSQLの両方を実行する設定。
 
 本番サイトの公開は行っていません。アプリの実装・この環境での検証・環境設定ドラフト保存と、本番公開は別です。
+
+## GitHub Actionsで判明した空のDB接続設定への対応
+
+SQLiteジョブでは `DATABASE_URL` が未設定ではなく空文字として渡され、従来の設定では `KeyError: 'ENGINE'` で管理コマンドが起動できませんでした。空文字の場合も既定のSQLite接続を選択するよう修正しました。未設定・空文字・PostgreSQLの接続文字列を、それぞれ新しいPythonプロセスで設定読み込みする回帰テストを追加しています。
+
+修正後、GitHub Actionsと同じ空文字の条件で collectstatic、check、マイグレーション差分確認が成功しました。SQLiteは41件中40件成功・PostgreSQL専用1件対象外。使い捨てPostgreSQL17でも同じ管理コマンドが成功し、41件すべてのテストが成功しました。GitHub Actions上の再実行結果は別途確認が必要です。
